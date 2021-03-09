@@ -1,9 +1,8 @@
 package data
 
 import (
-	"context"
+	"Book/conf"
 	"github.com/go-redis/redis"
-	"go-server/conf"
 	"log"
 )
 var Client *redis.Client
@@ -24,17 +23,17 @@ func initRedis(config conf.Config){
 }
 
 func FlushAll()(string,error)  {
-	return Client.FlushAll(context.TODO()).Result()
+	return Client.FlushAll().Result()
 }
 
 //加载lua脚本
 func LoadScript(script string)string  {
-	scriptExists,err:= Client.ScriptExists(context.TODO(),script).Result()
+	scriptExists,err:= Client.ScriptExists(script).Result()
 	if err!=nil{
 		panic("exist failed err: %v"+err.Error())
 	}
 	if !scriptExists[0]{
-		scriptSHA,err:=Client.ScriptLoad(context.TODO(),script).Result()
+		scriptSHA,err:=Client.ScriptLoad(script).Result()
 		if err!=nil{
 			panic("load script error"+err.Error())
 		}
@@ -45,7 +44,7 @@ func LoadScript(script string)string  {
 }
 
 func EvalSHA(SHA string,args[]string)(interface{},error)  {
-	val,err:=Client.Eval(context.TODO(),SHA,args).Result()
+	val,err:=Client.Eval(SHA,args).Result()
 	if err!=nil{
 		log.Println("eval failed err",err.Error())
 		return nil, err
@@ -55,33 +54,33 @@ func EvalSHA(SHA string,args[]string)(interface{},error)  {
 
 //set time forever
 func SetTime(key string,values interface{})(string,error)  {
-	val,err:=Client.Set(context.TODO(),key,values,0).Result()
+	val,err:=Client.Set(key,values,0).Result()
 	return val,err
 }
 
 //设置hash值 返回bool值
-func SetHash(key string,field map[string]interface{})(bool,error) {
-	return Client.HMSet(context.TODO(),key,field).Result()
+func SetHash(key string,field map[string]interface{})(string,error) {
+	return Client.HMSet(key,field).Result()
 }
 
 //获取hash表多个字段值hget 只能获取一个字段
 func GetMap(key string,fields ...string) ([]interface{},error) {
-	return Client.HMGet(context.TODO(),key,fields...).Result()
+	return Client.HMGet(key,fields...).Result()
 }
 
 
 func SetAdd(key string,field string)(int64,error)  {
-	return  Client.SAdd(context.TODO(),key,field).Result()
+	return  Client.SAdd(key,field).Result()
 }
 
 //判断是否是集合的值
 func SetIsMember(key string,field string)(bool,error)  {
-	return Client.SIsMember(context.TODO(),key,field).Result()
+	return Client.SIsMember(key,field).Result()
 }
 
 //获取集合所有成员
 func GetMembers(key string)([]string,error)  {
-	return Client.SMembers(context.TODO(),key).Result()
+	return Client.SMembers(key).Result()
 }
 
 

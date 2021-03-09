@@ -1,10 +1,10 @@
 package data
 
 import (
+	"Book/conf"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"go-server/conf"
 	"log"
 	"time"
 )

@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	//后续增加日志
 	_ "github.com/sirupsen/logrus"
-	"go-server/middleware"
 	"io"
 	_ "net/http/pprof"
 	"os"
@@ -23,14 +22,13 @@ func StartHttpServer(listen string)  {
 	router:=gin.Default()//暂时使用default
 
 	//增加中间件
-	router.Use(middleware.GetUseTime)
+	//router.Use(middleware.GetUseTime)
 
 	st:=router.Group("/open")
 	st.GET("/hello", GetTest)
 	st.GET("/get_book_by_id",GetBookById)
 
-	//异步消费运行
-	RunConsumer()
+
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")

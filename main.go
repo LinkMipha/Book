@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-server/gin_server"
+	"Book/gin_server"
 )
  var listen string = "9528"
 

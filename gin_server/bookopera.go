@@ -28,8 +28,7 @@ type GetBookByIdReq struct {
 func GetBookById(c *gin.Context)  {
 	req:=GetBookByIdReq{}
 	rsp:=GetBookByIdRsp{}
-
-	if err:=c.Bind(req);err!=nil{
+	if err:=c.Bind(&req);err!=nil{
 		log.Printf("GetBookById param err: %v",err)
 		basic.ResponseError(c,rsp,"param error")
 		return
