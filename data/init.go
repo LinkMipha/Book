@@ -14,3 +14,4 @@ func init()  {
 	InitMysql(config)
 	initRedis(config)
 }
+
