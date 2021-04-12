@@ -21,6 +21,7 @@ type HelloRsp struct {
 		} `json:"data"`
 	}
 }
+
 func GetTest(c*gin.Context)  {
 	req:= HelloReq{}
 	rsp:= HelloRsp{}
@@ -31,4 +32,9 @@ func GetTest(c*gin.Context)  {
 	rsp.Rsp.Data.Name = req.Name
 	rsp.Rsp.Data.Id = req.Id
 	c.JSON(200,rsp)
+}
+
+func GetMenu(c*gin.Context)  {
+
+	c.JSON(200,"")
 }

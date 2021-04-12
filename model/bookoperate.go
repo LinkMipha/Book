@@ -50,10 +50,17 @@ func (b *Book) GetBookByName(db *gorm.DB, name string) (book Book, err error) {
 	return book, err
 }
 
-//根据类型获取书籍
-func (b *Book) GetBookByType(db *gorm.DB, bookType string) ([]Book, error) {
+//根据类型分页获取书籍 一页 20
+func (b *Book) GetBookByType(db *gorm.DB, bookType string, pageIndex int, pageSize int) ([]Book, error) {
 	var books []Book
 	var err error
-	err = db.Table(b.TableName()).Where("book_type = ?", bookType).Find(&books).Error
+	sql := db.Table(b.TableName()).Where("book_type = ?", bookType)
+	//跳过条数
+	if pageIndex > 0 && pageSize > 0 {
+		err = sql.Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&books).Error
+	} else {
+		//默认20条数据
+		err = sql.Limit(20).Find(&books).Error
+	}
 	return books, err
 }

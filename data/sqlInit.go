@@ -20,6 +20,8 @@ func InitMysql(config conf.Config)  {
 	pwd := config.Database.Password
 	address := config.Database.Address
 	dbName := config.Database.DbName
+	fmt.Println(config)
+
 	dbLink := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		usr, pwd, address, dbName)
 	//失败重试

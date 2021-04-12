@@ -1,6 +1,7 @@
 redis:
   address: 127.0.0.1:6379
   network: tcp
+  user: root
   password:
   maxIdle: 1000
   MaxActive: 2000
@@ -8,7 +9,7 @@ redis:
 database:
   type: mysql
   user: root
-  password: root
+  password: qq2454546080
   dbName: book
   address: 127.0.0.1:3306
   maxIdle: 100

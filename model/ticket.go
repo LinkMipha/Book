@@ -25,3 +25,16 @@ func (t *Ticket) GetTicketsByUserId(db *gorm.DB, userId string) ([]Ticket, error
 	err = db.Table(t.TableName()).Where("user_id = ?", userId).Find(&ticket).Error
 	return ticket, err
 }
+
+//分页显示逾期信息
+func (t *Ticket) GetTicketsList(db *gorm.DB, pageIndex int, pageSize int) ([]Ticket, error) {
+	var ticket []Ticket
+	var err error
+	if pageSize > 0 && pageIndex > 0 {
+		err = db.Table(t.TableName()).Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&ticket).Error
+	} else {
+		//默认20
+		err = db.Table(t.TableName()).Limit(20).Offset(0).Find(&ticket).Error
+	}
+	return ticket, err
+}
