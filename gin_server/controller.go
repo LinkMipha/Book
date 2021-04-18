@@ -38,3 +38,12 @@ func GetMenu(c*gin.Context)  {
 
 	c.JSON(200,"")
 }
+
+func LoginIn(c *gin.Context)  {
+	c.JSON(200,"")
+}
+
+
+func CheckOut(c *gin.Context)  {
+	c.JSON(200,"")
+}

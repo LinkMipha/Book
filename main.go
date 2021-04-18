@@ -3,7 +3,7 @@ package main
 import (
 	"Book/gin_server"
 )
- var listen string = "8080"
+ var listen string = "7001"
 
 func main(){
 

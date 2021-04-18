@@ -52,6 +52,12 @@ func StartHttpServer(listen string)  {
 	st.GET("/get_book_by_id",GetBookById)
 	st.GET("renren-fast/sys/user/info",GetMenu)
 
+	//登陆
+	st.POST("api/login",LoginIn)
+
+	//检查登陆状态
+	st.GET("api/login/checkcode",CheckOut)
+
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")
