@@ -9,7 +9,7 @@ redis:
 database:
   type: mysql
   user: root
-  password: qq2454546080
+  password: root
   dbName: book
   address: 127.0.0.1:3306
   maxIdle: 100

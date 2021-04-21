@@ -40,7 +40,7 @@ func GetMenu(c*gin.Context)  {
 }
 
 func LoginIn(c *gin.Context)  {
-	c.JSON(200,"")
+	c.JSON(200,"stset")
 }
 
 
