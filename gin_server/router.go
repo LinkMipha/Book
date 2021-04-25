@@ -43,22 +43,25 @@ func StartHttpServer(listen string)  {
 	gin.ForceConsoleColor()
 	//日志
 	gin.DefaultWriter = io.MultiWriter(os.Stdout)
-	router:=gin.Default()//暂时使用default
-	router.Use(Cors())
+	ginRouter :=gin.Default() //暂时使用default
+	ginRouter.Use(Cors())
 	//增加中间件
 	//router.Use(middleware.GetUseTime)
 
-	st:=router.Group("/")
-	st.POST("renren-fast/sys/login", GetTest)
-	st.GET("renren-fast/sys/menu/nav",GetMenu)
-	st.GET("/get_book_by_id",GetBookById)
-	st.GET("renren-fast/sys/user/info",GetMenu)
+	router:=ginRouter.Group("/")
+	router.POST("renren-fast/sys/login", GetTest)
+	router.GET("renren-fast/sys/menu/nav",GetMenu)
+	router.GET("/get_book_by_id",GetBookById)
+	router.GET("renren-fast/sys/user/info",GetMenu)
 
 	//登陆
-	st.POST("api/login",LoginIn)
+	router.POST("api/login",LoginIn)
 
+
+	//获取菜单
+	router.GET("api/menus",GetMenus)
 	//检查登陆状态
-	st.GET("api/login/checkcode",CheckOut)
+	router.GET("api/login/checkcode",CheckOut)
 
 	//性能测试
 	go func() {
@@ -67,7 +70,7 @@ func StartHttpServer(listen string)  {
 	}()
 
 	//start
-	if err := router.Run(fmt.Sprintf(":%s",listen)); err != nil {
+	if err := ginRouter.Run(fmt.Sprintf(":%s",listen)); err != nil {
 		println("Error when running server. " + err.Error())
 	}
 

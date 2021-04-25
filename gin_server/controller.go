@@ -24,6 +24,7 @@ type HelloRsp struct {
 
 
 
+
 type CheckOutRsp struct {
 	Status string `json:"status"`
 	Description string `json:"description"`
@@ -53,10 +54,90 @@ func GetMenu(c *gin.Context) {
 }
 
 
-func LoginIn(c *gin.Context)  {
-	c.JSON(200,"stset")
+
+
+type LoginInReq struct {
+	UserName string `json:"username"`
+	PassWrod string `json:"password"`
 }
 
+type LoginInRsp struct {
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	Data        struct {
+		Name string `json:"name"`
+		Id   int    `json:"id"`
+		Token string `json:"token"`
+	} `json:"data"`
+}
+
+//登陆验证
+func LoginIn(c *gin.Context)  {
+	req:= LoginInReq{}
+	rsp:=LoginInRsp{}
+
+	if err:=c.BindJSON(&req);err!=nil{
+		log.Printf("LoginIn bind error:%v",err)
+		return
+	}
+	fmt.Println(req.UserName,req.PassWrod)
+	if req.UserName!="admin"||req.PassWrod!="admin"{
+		rsp.Status = "401"
+		rsp.Description = "failed"
+		c.JSON(200,rsp)
+		return
+	}
+
+	rsp.Status = "200"
+	rsp.Description = "success"
+	rsp.Data.Name = "link"
+	rsp.Data.Id = 12
+	rsp.Data.Token = "tokents statestast"
+	c.JSON(200,rsp)
+}
+
+
+
+
+type Menu struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Order string `json:"order"`
+}
+
+
+type GetMenusRsp struct {
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	Data        struct {
+		Menus  [] Menu `json:"menus"`
+	} `json:"data"`
+}
+
+
+//根据具体的身份获取相应的菜单
+func GetMenus(c *gin.Context)  {
+
+	rsp:=GetMenusRsp{}
+	rsp.Status = "200"
+	rsp.Description = "success"
+	menus :=make([]Menu,0)
+	for i:=0;i<3;i++{
+		menus = append(menus,Menu{
+			Id: i,
+			Name: "link",
+			Order: "order",
+		})
+	}
+	rsp.Data.Menus = menus
+
+	c.JSON(200,rsp)
+}
+
+
+
+
+//?验证
 func CheckOut(c *gin.Context) {
 	rsp := CheckOutRsp{}
 	rsp.IsAdmin = true
