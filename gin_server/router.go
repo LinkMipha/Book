@@ -63,6 +63,14 @@ func StartHttpServer(listen string)  {
 	//检查登陆状态
 	router.GET("api/login/checkcode",CheckOut)
 
+
+
+
+	//用户相关操作 之后移动到其他服务
+
+	router.GET("api/get_user_list",GetUserList)
+
+
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")

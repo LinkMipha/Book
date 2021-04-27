@@ -97,12 +97,18 @@ func LoginIn(c *gin.Context)  {
 }
 
 
-
+type ChildRen struct {
+	Id int `json:"id"`
+	Name string `json:"authName"`
+	Path string `json:"path"`
+}
 
 type Menu struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
 	Order string `json:"order"`
+	Path string `json:"path"`
+	ChildRen []ChildRen `json:"children"`
 }
 
 
@@ -127,6 +133,14 @@ func GetMenus(c *gin.Context)  {
 			Id: i,
 			Name: "link",
 			Order: "order",
+			ChildRen: []ChildRen{
+				{
+					Id: i,
+					Name: "mipha",
+					Path: "user",
+				},
+
+			},
 		})
 	}
 	rsp.Data.Menus = menus
@@ -146,4 +160,13 @@ func CheckOut(c *gin.Context) {
 	rsp.UpdateTime = "2021-04-07T02:51:16.008Z"
 	rsp.Id = "606d1e24eebc850a6c30d1c1"
 	c.JSON(200, rsp)
+}
+
+
+
+
+//用户相关代码
+
+func GetUserList(c*gin.Context)  {
+
 }
