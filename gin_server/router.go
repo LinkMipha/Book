@@ -65,10 +65,9 @@ func StartHttpServer(listen string)  {
 
 
 
-
 	//用户相关操作 之后移动到其他服务
+	router.GET("api/users",GetUserList)
 
-	router.GET("api/get_user_list",GetUserList)
 
 
 	//性能测试

@@ -1,6 +1,8 @@
 package gin_server
 
 import (
+	"Book/data"
+	"Book/model"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -131,7 +133,7 @@ func GetMenus(c *gin.Context)  {
 	for i:=0;i<3;i++{
 		menus = append(menus,Menu{
 			Id: i,
-			Name: "link",
+			Name: "简易菜单",
 			Order: "order",
 			ChildRen: []ChildRen{
 				{
@@ -163,10 +165,45 @@ func CheckOut(c *gin.Context) {
 }
 
 
+type Users struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+	PhoneNumber string `json:"phone_number"`
+	Status      int `json:"status"`
+}
 
+type GetUserListRsp struct {
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	Data        struct {
+		PageNum int `json:"page_num"`
+		Total int `json:"total"`
+		User []Users `json:"users"`
 
+	} `json:"data"`
+
+}
 //用户相关代码
 
 func GetUserList(c*gin.Context)  {
+	rsp:=GetUserListRsp{}
+	rsp.Status = "200"
+	rsp.Data.PageNum = 1
+	rsp.Data.Total = 20
+	var user model.User
 
+	 st,err:=user.GetUsersList(data.Db,1,20)
+	 fmt.Println(st)
+	 if err!=nil{
+	 	fmt.Println("tset")
+	 }
+	 for _,v:=range st{
+	 	rsp.Data.User = append(rsp.Data.User,Users{
+	 		Id: v.Id,
+			Name:v.Name,
+			Status: v.Status,
+		})
+	 }
+
+	c.JSON(200,rsp)
 }

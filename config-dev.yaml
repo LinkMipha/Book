@@ -10,7 +10,7 @@ database:
   type: mysql
   user: root
   password: root
-  dbName: book
+  dbName: link
   address: 127.0.0.1:3306
   maxIdle: 100
   maxOpen: 150
