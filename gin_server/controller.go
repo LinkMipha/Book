@@ -172,11 +172,19 @@ type Users struct {
 	Status      int `json:"status"`
 }
 
+
+
+
+type GetUserListReq struct {
+	Name  string `json:"query" form:"query"`
+	PageNum int `json:"pagenum" form:"pagenum"`
+	PageSize int `json:"pagesize" form:"pagesize"`
+}
+
 type GetUserListRsp struct {
 	Status      string `json:"status"`
 	Description string `json:"description"`
 	Data        struct {
-		PageNum int `json:"page_num"`
 		Total int `json:"total"`
 		User []Users `json:"users"`
 
@@ -186,17 +194,26 @@ type GetUserListRsp struct {
 //用户相关代码
 
 func GetUserList(c*gin.Context)  {
+	req:=GetUserListReq{}
 	rsp:=GetUserListRsp{}
-	rsp.Status = "200"
-	rsp.Data.PageNum = 1
-	rsp.Data.Total = 20
+	if err:=c.Bind(&req);err!=nil{
+		fmt.Println("GetUserList err"+err.Error())
+		rsp.Status = "400"
+		c.JSON(200,rsp)
+		return
+	}
 	var user model.User
-
-	 st,err:=user.GetUsersList(data.Db,1,20)
-	 fmt.Println(st)
+	 st,err:=user.GetUsersList(data.Db,req.PageNum,req.PageSize,req.Name)
 	 if err!=nil{
-	 	fmt.Println("tset")
+	 	fmt.Println("GetUsersList err"+err.Error())
 	 }
+
+	 total,err:=user.GetUserTotal(data.Db,req.Name)
+	 if err!=nil{
+		 fmt.Println("GetUserTotal err"+err.Error())
+	 }
+
+
 	 for _,v:=range st{
 	 	rsp.Data.User = append(rsp.Data.User,Users{
 	 		Id: v.Id,
@@ -205,5 +222,7 @@ func GetUserList(c*gin.Context)  {
 		})
 	 }
 
+	rsp.Status = "200"
+	rsp.Data.Total = total
 	c.JSON(200,rsp)
 }
