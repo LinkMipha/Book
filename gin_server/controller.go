@@ -1,6 +1,7 @@
 package gin_server
 
 import (
+	"Book/MiddleWare"
 	"Book/data"
 	"Book/model"
 	"fmt"
@@ -59,8 +60,8 @@ func GetMenu(c *gin.Context) {
 
 
 type LoginInReq struct {
-	UserName string `json:"username"`
-	PassWrod string `json:"password"`
+	UserName string `json:"username" form:"username"`
+	PassWrod string `json:"password" from:"password"`
 }
 
 type LoginInRsp struct {
@@ -80,21 +81,45 @@ func LoginIn(c *gin.Context)  {
 
 	if err:=c.BindJSON(&req);err!=nil{
 		log.Printf("LoginIn bind error:%v",err)
-		return
-	}
-	fmt.Println(req.UserName,req.PassWrod)
-	if req.UserName!="admin"||req.PassWrod!="admin"{
-		rsp.Status = "401"
-		rsp.Description = "failed"
+		rsp.Description = "bind error"
 		c.JSON(200,rsp)
 		return
 	}
 
+	user:=model.User{}
+	user,err:=user.GetUserByUserName(data.Db,req.UserName)
+	if err!=nil{
+		fmt.Printf("LoginIn error:%v\n",err)
+		rsp.Description = "GetUserByUserName error"
+		c.JSON(200,rsp)
+		return
+	}
+	fmt.Println(user)
+	if user.PassWord!=req.PassWrod{
+		rsp.Status = "401"
+		rsp.Description = "password"
+		c.JSON(200,rsp)
+		return
+	}
+
+	//设置token并且返回
+	var jwt = MiddleWare.NewJwt()
+
+	//荷载信息
+	claim:=MiddleWare.CustomClaims{
+		Username: req.UserName,
+		Password: req.PassWrod,
+		Kind:12,
+	}
+
+	token,err:=jwt.CreateToken(claim)
+	if err!=nil{
+		fmt.Println("CreateToken error",err)
+		return
+	}
+	rsp.Data.Token = token
 	rsp.Status = "200"
 	rsp.Description = "success"
-	rsp.Data.Name = "link"
-	rsp.Data.Id = 12
-	rsp.Data.Token = "tokents statestast"
 	c.JSON(200,rsp)
 }
 

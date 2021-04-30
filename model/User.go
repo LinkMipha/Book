@@ -57,6 +57,7 @@ func (u *User) GetUsersList(db *gorm.DB, pageIndex int, pageSize int,name string
 	return users, err
 }
 
+
 //查询用户
 func (u *User) GetUserIdByUserId(db *gorm.DB, Name string) (User, error) {
 	var user User
@@ -65,12 +66,25 @@ func (u *User) GetUserIdByUserId(db *gorm.DB, Name string) (User, error) {
 	return user, err
 }
 
+
+
 //标记删除用户
 func (u *User) DeleteUserById(db *gorm.DB, name string) error {
 	err := db.Table(u.TableName()).Where("name = ?", name).Update("status", 1).Error
 	return err
 }
 
+
+
+//userName查询用户
+func (u *User) GetUserByUserName(db *gorm.DB, userName string) (User, error) {
+	var user User
+	err := db.Table(u.TableName()).Where("userName = ?", userName).Where("status = ?",0).Limit(1).Find(&user).Error
+	fmt.Println(userName)
+	fmt.Println(user)
+	return user, err
+
+}
 
 //根据名字模糊查询
 func (u *User) GetUsersByName(db *gorm.DB, name string) (user []User, err error) {
