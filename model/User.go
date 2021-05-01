@@ -6,13 +6,14 @@ import (
 )
 
 //用户信息
+//gorm 设置自定义解析加上 column否则默认
 type User struct {
 	Id         int  `json:"id" gorm:"id"`
-	UserName string `json:"userName" gorm:"userName"`
-	PassWord string `json:"password" gorm:"password"`
+	UserName string `json:"userName" gorm:"column:userName"`
+	PassWord string `json:"password" gorm:"column:password"`
 	Sex int `json:"sex" gorm:"sex"`
 	Name string `json:"name" gorm:"name"`
-	IsAdmin int `json:"isAdmin" gorm:"isAdmin"`
+	IsAdmin int `json:"isAdmin" gorm:"column:isAdmin"`
 	Status int `json:"status" gorm:"status"` //1删除
 }
 
@@ -58,19 +59,39 @@ func (u *User) GetUsersList(db *gorm.DB, pageIndex int, pageSize int,name string
 }
 
 
-//查询用户
-func (u *User) GetUserIdByUserId(db *gorm.DB, Name string) (User, error) {
+//姓名查询用户
+func (u *User) GetUserIdByName(db *gorm.DB, Name string) (User, error) {
 	var user User
 	var err error
 	err = db.Table(u.TableName()).Where("name = ?", Name).Where("status = 0").Find(&user).Error
 	return user, err
 }
 
+//用户名查询用户
 
+func (u *User)GetUserIdByUserName(db*gorm.DB,userName string)(int,error)  {
+	var total int
+	var err error
+	err = db.Table(u.TableName()).Where("userName = ?",userName).Count(&total).Error
+	return total,err
+}
+
+
+//添加用户
+func (u*User)AddUserByMessage(db*gorm.DB,user User)error{
+	err:=db.Table(u.TableName()).Create(user).Error
+	return err
+}
+
+//更新用户信息
+func (u*User)UpdatesUser(db*gorm.DB,userName string,editUser map[string]interface{})error  {
+	err:=db.Table(u.TableName()).Where("userName = ?",userName).Updates(editUser).Error
+	return err
+}
 
 //标记删除用户
-func (u *User) DeleteUserById(db *gorm.DB, name string) error {
-	err := db.Table(u.TableName()).Where("name = ?", name).Update("status", 1).Error
+func (u *User) DeleteUserById(db *gorm.DB, userName string) error {
+	err := db.Table(u.TableName()).Where("userName = ?", userName).Update("status", 1).Error
 	return err
 }
 
@@ -79,9 +100,10 @@ func (u *User) DeleteUserById(db *gorm.DB, name string) error {
 //userName查询用户
 func (u *User) GetUserByUserName(db *gorm.DB, userName string) (User, error) {
 	var user User
-	err := db.Table(u.TableName()).Where("userName = ?", userName).Where("status = ?",0).Limit(1).Find(&user).Error
-	fmt.Println(userName)
-	fmt.Println(user)
+	//拿不到userName password
+	//err := db.Table(u.TableName()).Where("userName = ?", userName).Where("status = ?",0).Limit(1).First(&user).Error
+	sqlStr := "select *from users where userName  =  ? and status = 0 limit 1"
+	err := db.Table(u.TableName()).Raw(sqlStr, userName).Find(&user).Error
 	return user, err
 
 }

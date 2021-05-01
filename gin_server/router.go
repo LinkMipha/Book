@@ -24,7 +24,7 @@ func Cors() gin.HandlerFunc {
 		//c.Header("Access-Control-Allow-Origin", "http://localhost:8080")
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
-		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
 
@@ -68,8 +68,17 @@ func StartHttpServer(listen string)  {
 	//用户相关操作 之后移动到其他服务
 	router.GET("api/users",GetUserList)
 
+	//增加
+	router.POST("api/adduser",AddUser)
+
+	//用户名搜索
+	router.GET("api/get_user_by_username/:userName",GetUserByUserName)
+
+	//更新
+	router.PUT("api/edituser/:userName",EditUserByUserName)
 
 
+	router.POST("api/deleteUser",DeleteUserByUserName)
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")

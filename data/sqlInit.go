@@ -33,4 +33,7 @@ func InitMysql(config conf.Config)  {
 	}
 	Db.DB().SetMaxIdleConns(config.Database.MaxIdle)
 	Db.DB().SetMaxOpenConns(config.Database.MaxOpen)
+	//打印日志
+	Db.LogMode(true)
+
 }

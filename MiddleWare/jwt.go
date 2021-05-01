@@ -79,7 +79,7 @@ func SetSignKey(key string) string {
 
 //生成token
 func (j *Jwt) CreateToken(claims CustomClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.SigningKey)
 }
 
