@@ -51,21 +51,20 @@ func StartHttpServer(listen string)  {
 	router:=ginRouter.Group("/")
 	router.POST("renren-fast/sys/login", GetTest)
 	router.GET("renren-fast/sys/menu/nav",GetMenu)
-	router.GET("/get_book_by_id",GetBookById)
 	router.GET("renren-fast/sys/user/info",GetMenu)
 
 	//登陆
 	router.POST("api/login",LoginIn)
 
 
-	//获取菜单
+	//获取菜单操作  。。。。。。。。。。。。。。。
 	router.GET("api/menus",GetMenus)
 	//检查登陆状态
 	router.GET("api/login/checkcode",CheckOut)
 
 
 
-	//用户相关操作 之后移动到其他服务
+	//用户相关操作 之后移动到其他服务......................
 	router.GET("api/users",GetUserList)
 
 	//增加
@@ -79,6 +78,29 @@ func StartHttpServer(listen string)  {
 
 
 	router.POST("api/deleteUser",DeleteUserByUserName)
+
+
+
+	//图书相关操作之后移动到其他服务 。。。。。。。。。。。。。。
+
+
+	router.GET("api/books",GetBookList)
+
+	//增加
+	router.POST("api/addBook",AddNewBook)
+
+	//图书修改时查询信息
+	router.GET("api/get_book_by_isbn/:isbn",GetBookByIsbn)
+
+	//更新
+	router.PUT("api/editbook/:isbn",EditBookByIsbn)
+
+
+	router.POST("api/deleteBook",DeleteUserByIsbn)
+
+
+
+
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")

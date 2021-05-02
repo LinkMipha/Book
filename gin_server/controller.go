@@ -124,57 +124,6 @@ func LoginIn(c *gin.Context)  {
 }
 
 
-type ChildRen struct {
-	Id int `json:"id"`
-	Name string `json:"authName"`
-	Path string `json:"path"`
-}
-
-type Menu struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Order string `json:"order"`
-	Path string `json:"path"`
-	ChildRen []ChildRen `json:"children"`
-}
-
-
-type GetMenusRsp struct {
-	Status      string `json:"status"`
-	Description string `json:"description"`
-	Data        struct {
-		Menus  [] Menu `json:"menus"`
-	} `json:"data"`
-}
-
-
-//根据具体的身份获取相应的菜单
-func GetMenus(c *gin.Context)  {
-
-	rsp:=GetMenusRsp{}
-	rsp.Status = "200"
-	rsp.Description = "success"
-	menus :=make([]Menu,0)
-	for i:=0;i<3;i++{
-		menus = append(menus,Menu{
-			Id: i,
-			Name: "简易菜单",
-			Order: "order",
-			ChildRen: []ChildRen{
-				{
-					Id: i,
-					Name: "mipha",
-					Path: "user",
-				},
-
-			},
-		})
-	}
-	rsp.Data.Menus = menus
-	c.JSON(200,rsp)
-}
-
-
 
 
 //?验证
