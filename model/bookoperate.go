@@ -1,6 +1,9 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import (
+	"errors"
+	"github.com/jinzhu/gorm"
+)
 
 //书籍操作
 type Book struct {
@@ -108,4 +111,27 @@ func (b *Book) GetBookByType(db *gorm.DB, bookType string, pageIndex int, pageSi
 		err = sql.Limit(20).Find(&books).Error
 	}
 	return books, err
+}
+
+//减少库存(应该使用乐观锁或者redis分布式锁)
+func(b *Book) SubBookStockByIsbn(db*gorm.DB,isbn string)error{
+	var book Book
+	db.Table(b.TableName()).Where("isbn = ?",isbn).First(&book)
+	if book.Stock<=0{
+		return errors.New("库存不足")
+	}
+	err:=db.Table(b.TableName()).Where("isbn = ?",isbn).Update("stock",book.Stock-1).Error
+	return err
+}
+
+
+//增加库存(应该使用乐观锁或者redis分布式锁)
+func(b *Book) AddBookStockByIsbn(db*gorm.DB,isbn string)error{
+	var book Book
+	db.Table(b.TableName()).Where("isbn = ?",isbn).First(&book)
+	if book.Stock<0{
+		return errors.New("库存不足")
+	}
+	err:=db.Table(b.TableName()).Where("isbn = ?",isbn).Update("stock",book.Stock+1).Error
+	return err
 }

@@ -79,7 +79,7 @@ func (u *User)GetUserIdByUserName(db*gorm.DB,userName string)(int,error)  {
 
 //添加用户
 func (u*User)AddUserByMessage(db*gorm.DB,user User)error{
-	err:=db.Table(u.TableName()).Create(user).Error
+	err:=db.Table(u.TableName()).Create(&user).Error
 	return err
 }
 
@@ -113,4 +113,11 @@ func (u *User) GetUsersByName(db *gorm.DB, name string) (user []User, err error)
 	sqlStr := "select *from biz_book where name like ? and status = 0"
 	err = db.Table(u.TableName()).Raw(sqlStr, name).Find(&user).Error
 	return user, err
+}
+
+
+//重置密码
+func (u *User)ResetPassword(db *gorm.DB, name string)error{
+	err:=db.Table(u.TableName()).Where("userName = ?",name).Update("password",name).Error
+	return err
 }

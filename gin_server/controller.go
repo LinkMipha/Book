@@ -6,54 +6,61 @@ import (
 	"Book/model"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"log"
 )
 
-type HelloReq struct {
-	Id int `json:"id" form:"id"`
-	Name string `json:"name" form:"name"`
-}
 
-type HelloRsp struct {
-	Rsp struct {
-		Status      string `json:"status"`
-		Description string `json:"description"`
-		Data        struct {
-			Name string `json:"name"`
-			Id   int    `json:"id"`
-		} `json:"data"`
-	}
+type RegisterReq struct {
+	UserName string `json:"username" form:"username"`
+	PassWrod string `json:"password" from:"password"`
 }
 
 
-
-
-type CheckOutRsp struct {
-	Status string `json:"status"`
+type RegisterRsp struct {
+	Status      string `json:"status"`
 	Description string `json:"description"`
-	Id string `json:"_id"`
-	UpdateTime  string `json:"updatedAt"`
-	CreatedAt  string `json:"createdAt"`
-	UserName string `json:"userName"`
-	Name string `json:"name"`
-	IsAdmin bool `json:"isAdmin"`
+	Data        struct {
+
+	} `json:"data"`
 }
 
-func GetTest(c*gin.Context)  {
-	req:= HelloReq{}
-	rsp:= HelloRsp{}
-	if err:=c.Bind(&req);err!=nil{
-		log.Fatal("test") //服务断开
+func Register(c*gin.Context)  {
+	req:=RegisterReq{}
+	rsp:=RegisterRsp{}
+	if err:=c.BindJSON(&req);err!=nil{
+		log.Printf("Register bind error:%v",err)
+		rsp.Description = "bind error"
+		c.JSON(200,rsp)
+		return
 	}
-	fmt.Println(req)
-	rsp.Rsp.Data.Name = req.Name
-	rsp.Rsp.Data.Id = req.Id
+
+	var user model.User
+	_,err:=user.GetUserByUserName(data.Db,req.UserName)
+	if err!=nil&&err!=gorm.ErrRecordNotFound{
+		log.Printf("Register GetUserByUserName error:%v",err)
+		rsp.Description = "注册失败"
+		c.JSON(200,rsp)
+		return
+	}
+	if err!=gorm.ErrRecordNotFound{
+		log.Printf("Register GetUserByUserName error:%v",err)
+		rsp.Description = "用户名已存在"
+		c.JSON(200,rsp)
+		return
+	}
+    user.UserName = req.UserName
+    user.PassWord = req.PassWrod
+	err = user.AddUserByMessage(data.Db,user)
+	if err!=nil{
+		log.Printf("Register AddUserByMessage error:%v",err)
+		rsp.Description = "注册失败"
+		c.JSON(200,rsp)
+		return
+	}
+	rsp.Status = "200"
+	rsp.Description = "注册成功"
 	c.JSON(200,rsp)
-}
-
-func GetMenu(c *gin.Context) {
-
-	c.JSON(200, "")
 }
 
 
@@ -124,18 +131,6 @@ func LoginIn(c *gin.Context)  {
 }
 
 
-
-
-//?验证
-func CheckOut(c *gin.Context) {
-	rsp := CheckOutRsp{}
-	rsp.IsAdmin = true
-	rsp.Name = "管理员"
-	rsp.CreatedAt = "2021-04-07T02:51:16.008Z"
-	rsp.UpdateTime = "2021-04-07T02:51:16.008Z"
-	rsp.Id = "606d1e24eebc850a6c30d1c1"
-	c.JSON(200, rsp)
-}
 
 
 type Users struct {
@@ -405,4 +400,42 @@ func DeleteUserByUserName(c*gin.Context)  {
 	c.JSON(200,rsp)
 	return
 
+}
+
+type ResetUserPasswordReq struct {
+	UserName string `json:"user_name"`
+}
+
+
+type ResetUserPasswordRsp struct {
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	Data        struct {
+	} `json:"data"`
+}
+
+func ResetUserPassword(c*gin.Context)  {
+	req:=ResetUserPasswordReq{}
+	rsp:=ResetUserPasswordRsp{}
+	if err:=c.Bind(&req);err!=nil{
+		fmt.Println("ResetUserPassword bind err"+err.Error())
+		rsp.Status = "401"
+		rsp.Description = "bind error"
+		c.JSON(200,rsp)
+		return
+	}
+
+	var user model.User
+	err:=user.ResetPassword(data.Db,req.UserName)
+	if err!=nil{
+		fmt.Println("ResetPassword error")
+		rsp.Status = "401"
+		rsp.Description = "ResetPassword error"
+		c.JSON(200,rsp)
+		return
+	}
+	rsp.Status = "200"
+	rsp.Description = "重置成功"
+	c.JSON(200,rsp)
+	return
 }
