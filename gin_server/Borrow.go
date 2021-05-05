@@ -336,9 +336,6 @@ func DelBorRecord(c*gin.Context)  {
 }
 
 
-
-
-
 type RevertBookReq struct {
 	UserId string `json:"user_id"`
 	BookId string `json:"book_id"`
