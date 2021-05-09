@@ -78,6 +78,7 @@ type LoginInRsp struct {
 		Name string `json:"name"`
 		Id   int    `json:"id"`
 		Token string `json:"token"`
+		IsAdmin int `json:"is_admin"`
 	} `json:"data"`
 }
 
@@ -124,6 +125,7 @@ func LoginIn(c *gin.Context)  {
 		fmt.Println("CreateToken error",err)
 		return
 	}
+	rsp.Data.IsAdmin = user.IsAdmin
 	rsp.Data.Token = token
 	rsp.Status = "200"
 	rsp.Description = "success"
@@ -140,6 +142,7 @@ type Users struct {
 	//PhoneNumber string `json:"phone_number"`
 	Sex  int `json:"sex"`
 	Status      int `json:"status"`
+	Phone string `json:"phone" form:"phone"`
 }
 
 
@@ -192,6 +195,7 @@ func GetUserList(c*gin.Context)  {
 			Name:v.Name,
 			Sex: v.Sex,
 			Status: v.Status,
+			Phone: v.Phone,
 		})
 	 }
 
@@ -201,12 +205,13 @@ func GetUserList(c*gin.Context)  {
 }
 
 
-//添加用户
+//添加用户 json会影响数据的解析
 type AddUserReq struct {
-	UserName string `json:"user_name" form:"username"`
-	PassWord string `json:"pass_word" form:"password"`
+	UserName string `json:"username" form:"username"`
+	PassWord string `json:"password" form:"password"`
 	Name string `json:"name" form:"name"`
 	Sex string `json:"sex" form:"sex"` //被迫使用string
+	Phone string `json:"phone" form:"phone"`
 }
 
 type AddUserRsp struct {
@@ -220,7 +225,7 @@ type AddUserRsp struct {
 }
 
 func AddUser(c*gin.Context)  {
-	req:=&AddUserReq{}
+	req:=AddUserReq{}
 	rsp:=AddUserRsp{}
 	if err:=c.Bind(&req);err!=nil{
 		fmt.Println("AddUser err"+err.Error())
@@ -228,7 +233,6 @@ func AddUser(c*gin.Context)  {
 		c.JSON(200,rsp)
 		return
 	}
-
 	var user model.User
 	total,err:=user.GetUserIdByUserName(data.Db,req.UserName)
 	if err!=nil{
@@ -244,10 +248,12 @@ func AddUser(c*gin.Context)  {
 		c.JSON(200,rsp)
 	}
 
+
 	var addUser model.User
 	addUser.UserName = req.UserName
 	addUser.PassWord = req.PassWord
 	addUser.Name = req.Name
+	addUser.Phone = req.Phone
 	if req.Sex=="男"{
 		addUser.Sex = 0
 	}else{
@@ -306,6 +312,7 @@ func GetUserByUserName(c*gin.Context)  {
 	rsp.Data.User.UserName = user.UserName
 	rsp.Data.User.Name = user.Name
 	rsp.Data.User.Sex = user.Sex
+	rsp.Data.User.Phone = user.Phone
     rsp.Status = "200"
     c.JSON(200,rsp)
 	return
@@ -315,6 +322,7 @@ type EditUserByUserNameReq struct {
 	UserName string `json:"userName" form:"userName"`
 	Name string `json:"name" form:"name"`
 	Sex string `json:"sex" form:"sex"`
+	Phone string `json:"phone" form:"phone"`
 }
 
 
@@ -340,6 +348,7 @@ func EditUserByUserName(c*gin.Context)  {
 	}
 	editUser:=make(map[string]interface{},0)
 	editUser["Name"] = req.Name
+	editUser["phone"] = req.Phone
 	if req.Sex=="男"{
 		editUser["sex"] = 0
 	}else{

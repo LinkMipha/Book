@@ -15,6 +15,7 @@ type User struct {
 	Name string `json:"name" gorm:"name"`
 	IsAdmin int `json:"isAdmin" gorm:"column:isAdmin"`
 	Status int `json:"status" gorm:"status"` //1删除
+	Phone string `json:"phone" gorm:"phone"` //手机号
 }
 
 func (u *User) TableName() string {
@@ -72,7 +73,7 @@ func (u *User) GetUserIdByName(db *gorm.DB, Name string) (User, error) {
 func (u *User)GetUserIdByUserName(db*gorm.DB,userName string)(int,error)  {
 	var total int
 	var err error
-	err = db.Table(u.TableName()).Where("userName = ?",userName).Count(&total).Error
+	err = db.Table(u.TableName()).Where("userName = ?",userName).Where("status = ?",0).Count(&total).Error
 	return total,err
 }
 

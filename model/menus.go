@@ -19,7 +19,7 @@ func (m*Menus)TableNmae() string {
 func (m*Menus)GetByParentId(db*gorm.DB,parentId int,isAdmin int)([]Menus,error)  {
 	var menus []Menus
 	var err error
-	err  = db.Table(m.TableNmae()).Where("parent_id = ?",parentId).Where("is_admin = ?",isAdmin).Find(&menus).Error
+	err  = db.Table(m.TableNmae()).Where("parent_id = ?",parentId).Find(&menus).Error
 	return menus,err
 }
 
