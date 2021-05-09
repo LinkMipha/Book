@@ -15,6 +15,7 @@ type Book struct {
 	Price       float64 `json:"price" gorm:"price"`
 	BookType    string  `json:"book_type" gorm:"book_type"` //类型
 	Stock       int     `json:"stock" gorm:"stock"`
+	ImgUrl 		string `json:"img_url" gorm:"img_url"`
 }
 
 func (b *Book) TableName() string {

@@ -27,6 +27,7 @@ type Books struct {
 	Price  float64 `json:"price"`
 	BookType string `json:"book_type"`
 	Stock int `json:"stock"`
+	ImgUrl string `json:"img_url"`
 }
 
 type GetBookListRsp struct {
@@ -78,6 +79,7 @@ func GetBookList(c*gin.Context){
 			Price  :v.Price,
 			BookType:v.BookType,
 			Stock :v.Stock,
+			ImgUrl: v.ImgUrl,
 		})
 	}
 	rsp.Status = "200"

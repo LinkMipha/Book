@@ -193,3 +193,9 @@ func (b*Borrow)ReNewBorrow(db*gorm.DB,userId string, bookId string)error  {
 	}
 	return err
 }
+
+
+//获取借阅最多次数的四本图书
+//func (b*Borrow)GetTopBooks(db*gorm.DB) (error,Borrow) {
+//
+//}
