@@ -195,6 +195,29 @@ func (b*Borrow)ReNewBorrow(db*gorm.DB,userId string, bookId string)error  {
 }
 
 
+//查找借阅的书
+//根据userId查询借阅列表 逾期，未逾期 通过未通过都算上
+func (b*Borrow)GetBorrowByUserIdBookId(db*gorm.DB,userId string,bookId string)([]Borrow,error){
+	var borrows []Borrow
+	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("book_id = ?",bookId).Where("is_del = 0").Find(&borrows).Error
+	return borrows,err
+}
+
+
+//批量获取未删除借阅数据
+func (b*Borrow)GetCountRecord(db*gorm.DB,lastId int)([]Borrow,error){
+	var borrows []Borrow
+	err:=db.Table(b.TableName()).Where("id > ?",lastId).Where("IsDel = ?",0).Order("Id asc").Limit(100).Find(&borrows).Error
+	return borrows,err
+}
+
+
+//更新数据
+func (b*Borrow)UpdateBorrow(db*gorm.DB, id int,ma map[string]interface{})error {
+	err := db.Table(b.TableName()).Where("id = ?",id).Update(ma).Error
+	return  err
+}
+
 //获取借阅最多次数的四本图书
 //func (b*Borrow)GetTopBooks(db*gorm.DB) (error,Borrow) {
 //

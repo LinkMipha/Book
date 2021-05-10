@@ -122,3 +122,10 @@ func (u *User)ResetPassword(db *gorm.DB, name string)error{
 	err:=db.Table(u.TableName()).Where("userName = ?",name).Update("password",name).Error
 	return err
 }
+
+//获取所有用户信息(数据量较小)
+func (u *User)GetAllUsers(db*gorm.DB)([]User,error)  {
+	var users []User
+	err:=db.Table(u.TableName()).Find(&users).Error
+	return users,err
+}

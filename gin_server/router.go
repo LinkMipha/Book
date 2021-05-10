@@ -21,8 +21,8 @@ func Cors() gin.HandlerFunc {
 		method := c.Request.Method
 
 		//指定端口跨域
-		//c.Header("Access-Control-Allow-Origin", "http://localhost:8080")
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", "http://localhost:8080")
+		//c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
@@ -126,6 +126,9 @@ func StartHttpServer(listen string)  {
 
 
 
+
+	//手动调用判断是否逾期
+	router.POST("api/count_record_time",GinCountBookTime)
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")

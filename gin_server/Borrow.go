@@ -80,21 +80,39 @@ func AddBorrow(c*gin.Context) {
 		c.JSON(200,rsp)
 		return
 	}
+	//判断是否借阅已经存在，且未删除未归还
+
+	var borrow model.Borrow
+	bors,err:=borrow.GetBorrowByUserIdBookId(data.Db,req.Borrow.UserId,req.Borrow.BookId)
+	if err!=nil{
+		fmt.Println("AddBorrow model GetBorrowByUserIdBookId err"+err.Error())
+		rsp.Status = "401"
+		c.JSON(200,rsp)
+		return
+	}
+	if len(bors)>0{
+		fmt.Println("AddBorrow len bors >0 ")
+		rsp.Status = "401"
+		rsp.Description = "借阅已存在，请归还后再借"
+		c.JSON(200,rsp)
+		return
+	}
+
 	req.Borrow.BrrowTime = time.Now()
 	//归还时间增加一个月
 	req.Borrow.RetTime = time.Now().AddDate(0,1,0)
-
-	var borrow model.Borrow
+	req.Borrow.RealTime = time.Now().AddDate(0,0,-1)
 	//使用事务会出释放问题
 	//data.Db.Begin()
 
 	//减少库存数量
 	var book model.Book
-	err :=book.SubBookStockByIsbn(data.Db,req.Borrow.BookId)
+	err =book.SubBookStockByIsbn(data.Db,req.Borrow.BookId)
 	if err!=nil{
 		//data.Db.Rollback()
 		fmt.Println("AddBorrow model SubBookStockByIsbn err"+err.Error())
 		rsp.Status = "401"
+		rsp.Description = "库存不足"
 		c.JSON(200,rsp)
 		return
 	}
@@ -116,7 +134,7 @@ func AddBorrow(c*gin.Context) {
 	//提交事务
 	//data.Db.Commit()
 	rsp.Status = "200"
-	rsp.Description = "借阅失败"
+	rsp.Description = "借阅成功"
 	c.JSON(200,rsp)
 	return
 }
