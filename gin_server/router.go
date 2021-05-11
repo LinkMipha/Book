@@ -14,7 +14,6 @@ import (
 
 const port = 20080
 
-
 // 处理跨域请求,支持options访问
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -37,106 +36,97 @@ func Cors() gin.HandlerFunc {
 	}
 }
 
-func StartHttpServer(listen string)  {
+func StartHttpServer(listen string) {
 
 	//控制台颜色
 	gin.ForceConsoleColor()
 	//日志
 	gin.DefaultWriter = io.MultiWriter(os.Stdout)
-	ginRouter :=gin.Default() //暂时使用default
+	ginRouter := gin.Default() //暂时使用default
 	ginRouter.Use(Cors())
 	//增加中间件
 	//router.Use(middleware.GetUseTime)
 
-	router:=ginRouter.Group("/")
-
+	router := ginRouter.Group("/")
 
 	//注册
-	router.POST("api/register",Register)
+	router.POST("api/register", Register)
 
 	//登陆
-	router.POST("api/login",LoginIn)
-
+	router.POST("api/login", LoginIn)
 
 	//获取菜单操作  。。。。。。。。。。。。。。。
-	router.GET("api/menus",GetMenus)
-
-
-
-
+	router.GET("api/menus", GetMenus)
 
 	//用户相关操作 之后移动到其他服务......................
-	router.GET("api/users",GetUserList)
+	router.GET("api/users", GetUserList)
 
 	//增加
-	router.POST("api/adduser",AddUser)
+	router.POST("api/adduser", AddUser)
 
 	//用户名搜索
-	router.GET("api/get_user_by_username/:userName",GetUserByUserName)
+	router.GET("api/get_user_by_username/:userName", GetUserByUserName)
 
 	//更新
-	router.PUT("api/edituser/:userName",EditUserByUserName)
+	router.PUT("api/edituser/:userName", EditUserByUserName)
 
-    //删除用户
-	router.POST("api/deleteUser",DeleteUserByUserName)
+	//删除用户
+	router.POST("api/deleteUser", DeleteUserByUserName)
 
-    //重置密码
-    router.POST("api/reset_password",ResetUserPassword)
+	//重置密码
+	router.POST("api/reset_password", ResetUserPassword)
 
 	//图书相关操作之后移动到其他服务 。。。。。。。。。。。。。。
 
-
-	router.GET("api/books",GetBookList)
+	router.GET("api/books", GetBookList)
 
 	//增加
-	router.POST("api/addBook",AddNewBook)
+	router.POST("api/addBook", AddNewBook)
 
 	//图书修改时查询信息
-	router.GET("api/get_book_by_isbn/:isbn",GetBookByIsbn)
+	router.GET("api/get_book_by_isbn/:isbn", GetBookByIsbn)
 
 	//更新
-	router.PUT("api/editbook/:isbn",EditBookByIsbn)
+	router.PUT("api/editbook/:isbn", EditBookByIsbn)
 
-
-	router.POST("api/deleteBook",DeleteUserByIsbn)
-
+	//删除图书
+	router.POST("api/deleteBook", DeleteUserByIsbn)
 
 	//图书续借  用户点击
-	router.POST("api/renew_borrow",ReNewBorrow)
+	router.POST("api/renew_borrow", ReNewBorrow)
 
-	//借阅相关接口
-	router.POST("api/add_borrow",AddBorrow)
+	//借阅相关接口 ....................
+	//借书（用户借阅，检查是否有逾期）
+	router.POST("api/add_borrow", AddBorrow)
 
 	//获取总的借阅记录
-	router.GET("api/get_borrow_records",GetBorrowRecords)
+	router.GET("api/get_borrow_records", GetBorrowRecords)
 
 	//获取个人借阅记录
-	router.GET("api/get_user_borrow_record",GetUserBorrowRecord)
-
-
+	router.GET("api/get_user_borrow_record", GetUserBorrowRecord)
 
 	//删除借阅记录 管理员功能
-	router.POST("api/del_borrow_record",DelBorRecord)
+	router.POST("api/del_borrow_record", DelBorRecord)
 
-	//借出图书
-	router.POST("api/verifyRecord",BorrowAddRecord)
+	//借出图书(管理员审核)
+	router.POST("api/verifyRecord", BorrowAddRecord)
 
-    //还书 管理员功能
-    router.POST("api/revert_record",RevertBook)
+	//还书 管理员功能
+	router.POST("api/revert_record", RevertBook)
 
-
-
+	//获取个人逾期信息提醒
+	router.GET("api/get_user_borrow_content", GetUserBorrowContent)
 
 	//手动调用判断是否逾期
-	router.POST("api/count_record_time",GinCountBookTime)
+	router.POST("api/count_record_time", GinCountBookTime)
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")
-		fmt.Println(http.ListenAndServe(":9876",nil))
+		fmt.Println(http.ListenAndServe(":9876", nil))
 	}()
 
 	//start
-	if err := ginRouter.Run(fmt.Sprintf(":%s",listen)); err != nil {
+	if err := ginRouter.Run(fmt.Sprintf(":%s", listen)); err != nil {
 		println("Error when running server. " + err.Error())
 	}
 

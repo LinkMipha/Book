@@ -159,9 +159,19 @@ func (b*Borrow)GetBorrowByUserId(db*gorm.DB,userId string)([]Borrow,error){
 	return borrows,err
 }
 
+//根据user_id查询逾期的书籍
+func (b*Borrow)GetOverBorrowByUserId(db*gorm.DB,userId string)([]Borrow,error){
+	var borrows []Borrow
+	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("is_over = 1").Find(&borrows).Error
+	return borrows,err
+}
+
 //还书 更改 status = 1改为status = 2
 func (b*Borrow)RevertBook (db*gorm.DB,userId string, bookId string)error {
-	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("book_id = ?",bookId).Where("status = ?",1).Update("status",2).Error
+	status:=make(map[string]interface{})
+	status["status"] = 2
+	status["is_over"] = 0
+	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("book_id = ?",bookId).Where("status = ?",1).Update(status).Error
 	return err
 }
 
@@ -203,11 +213,18 @@ func (b*Borrow)GetBorrowByUserIdBookId(db*gorm.DB,userId string,bookId string)([
 	return borrows,err
 }
 
+//用户借阅的书籍，通过借阅且未归还
+func (b*Borrow)GetBorRecordByUserId(db*gorm.DB,userId string)([]Borrow,error){
+	var borrows []Borrow
+	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("is_del = ?",0).Where("status = ?",1).Find(&borrows).Error
+	return borrows,err
+}
 
-//批量获取未删除借阅数据
+
+//批量获取未删除借阅数据  只计算已经借出去的
 func (b*Borrow)GetCountRecord(db*gorm.DB,lastId int)([]Borrow,error){
 	var borrows []Borrow
-	err:=db.Table(b.TableName()).Where("id > ?",lastId).Where("IsDel = ?",0).Order("Id asc").Limit(100).Find(&borrows).Error
+	err:=db.Table(b.TableName()).Where("id > ?",lastId).Where("is_del = ?",0).Where("status = ?",1).Order("id asc").Limit(100).Find(&borrows).Error
 	return borrows,err
 }
 

@@ -16,7 +16,12 @@ func main(){
 	//go gin_server.SendEmail()
 
 	//定时任务计算是否逾期
-	go gin_server.StartTimerBegin(time.Now(),gin_server.CountBookTime(0,0))
+	go gin_server.StartTimerBegin(time.Now(),gin_server.CountBookTime)
+	//定时任务发送逾期邮件 时间可以设置
+	go gin_server.StartTimerBegin(time.Now(),gin_server.SendEmailTimer)
+
+	//定时清除今天没有通过审核的记录
+
 	gin_server.StartHttpServer(listen)
 
 }

@@ -16,6 +16,8 @@ type User struct {
 	IsAdmin int `json:"isAdmin" gorm:"column:isAdmin"`
 	Status int `json:"status" gorm:"status"` //1删除
 	Phone string `json:"phone" gorm:"phone"` //手机号
+	Email  string `json:"email" gorm:"email"` //邮箱
+	Count int `json:"count" gorm:"email"` //借书数量限制50本
 }
 
 func (u *User) TableName() string {
@@ -96,6 +98,13 @@ func (u *User) DeleteUserById(db *gorm.DB, userName string) error {
 	return err
 }
 
+func  (u *User)DeleteUserHardById (db *gorm.DB, userName string) error {
+	var user User
+	db.Table(u.TableName()).Where("userName = ?", userName).First(&user)
+
+	err := db.Table(u.TableName()).Where("userName = ?", userName).Delete(user).Error
+	return err
+}
 
 
 //userName查询用户
@@ -123,7 +132,7 @@ func (u *User)ResetPassword(db *gorm.DB, name string)error{
 	return err
 }
 
-//获取所有用户信息(数据量较小)
+//获取所有用户信息(数据量较小,不然要分批进行查询和发送邮件)
 func (u *User)GetAllUsers(db*gorm.DB)([]User,error)  {
 	var users []User
 	err:=db.Table(u.TableName()).Find(&users).Error
