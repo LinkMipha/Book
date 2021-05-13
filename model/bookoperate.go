@@ -57,6 +57,12 @@ func (b *Book) GetBookByName(db *gorm.DB, name string) (book Book, err error) {
 	return book, err
 }
 
+//根据id查询书籍
+func (b *Book) GetBookById(db *gorm.DB, id int) (book Book, err error) {
+	err = db.Table(b.TableName()).Where("id = ?",id).First(&book).Error
+	return book,err
+}
+
 
 //查询书籍数量
 func (b*Book)GetBookTotal(db*gorm.DB)(int,error)  {
@@ -93,6 +99,13 @@ func (b *Book) GetBookByItem(db *gorm.DB,isbn string,Name string, bookType strin
 }
 
 
+//书籍总数
+func (b *Book)GetBookTotalNon(db*gorm.DB)(error,int) {
+	var total int
+	err:=db.Table(b.TableName()).Count(&total).Error
+	return err,total
+
+}
 
 
 //根据类型分页获取书籍 一页 20

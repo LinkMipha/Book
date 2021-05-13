@@ -197,10 +197,16 @@ func SendEmailTimer(x, y int) {
 
 		body += "亲爱的用户您好:    <br>"
 		if len(isOver) > 0 {
+			for i:=0;i<len(isOver);i++{
+				isOver[i] =fmt.Sprintf("《%s》",isOver[i])
+			}
 			isOverString := strings.Join(isOver, ",")
 			body += fmt.Sprintf("有逾期书籍%s，请及时联系管理员还书～<br>", isOverString)
 		}
 		if len(willOver) > 0 {
+			for i:=0;i<len(willOver);i++{
+				willOver[i] =fmt.Sprintf("《%s》",willOver[i])
+			}
 			willOverString := strings.Join(willOver, ",")
 			body += fmt.Sprintf("有书籍即将逾期%s，请及时还书或续借～<br>", willOverString)
 		}

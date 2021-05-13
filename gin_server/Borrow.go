@@ -71,7 +71,7 @@ func AddBorrow(c *gin.Context) {
 		c.JSON(200, rsp)
 		return
 	}
-	//判断是否有逾期数据
+	//判断是否有逾期数据（逾期且没归还，已经归还则不计算在内）
 	var borrow model.Borrow
 	records,err := borrow.GetOverBorrowByUserId(data.Db,req.Borrow.UserId)
 	if len(records)>0{
@@ -439,7 +439,6 @@ func GetUserBorrowContent(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("**********************", req.UserName)
 	//即将逾期和已经逾期
 	var isOver []string
 	var willOver []string
@@ -470,16 +469,48 @@ func GetUserBorrowContent(c *gin.Context) {
 	}
 
 	if len(isOver) > 0 {
+		for i:=0;i<len(isOver);i++{
+			isOver[i] =fmt.Sprintf("《%s》",isOver[i])
+		}
 		isOverString := strings.Join(isOver, ",")
 		body += fmt.Sprintf("有逾期书籍%s，请及时联系管理员还书～\n", isOverString)
 	}
 	if len(willOver) > 0 {
+		for i:=0;i<len(willOver);i++{
+			willOver[i] =fmt.Sprintf("《%s》",willOver[i])
+		}
 		willOverString := strings.Join(willOver, ",")
 		body += fmt.Sprintf("有书籍即将逾期%s，请及时还书或续借～", willOverString)
 	}
 
 	rsp.Data.IsTip = 1
 	rsp.Data.Content = body
+	rsp.Status = "200"
+	c.JSON(200, rsp)
+	return
+}
+
+type GetRecommendBooksRsp struct {
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	Data        struct {
+		ImgUrl []string `json:"img_url" form:"img_url"`
+	} `json:"data"`
+}
+
+func GetRecommendBooks(c *gin.Context) {
+	rsp := GetRecommendBooksRsp{}
+	var borrow model.Borrow
+	imgUrls, err := borrow.GetTopBooks(data.Db)
+	if err != nil {
+		rsp.Status = "400"
+		rsp.Description = "获取图书链接失败"
+		c.JSON(200, rsp)
+		return
+	}
+	fmt.Println("***************",rsp.Data.ImgUrl)
+	rsp.Data.ImgUrl = imgUrls
+	rsp.Description = "链接获取成功"
 	rsp.Status = "200"
 	c.JSON(200, rsp)
 	return

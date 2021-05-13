@@ -134,6 +134,7 @@ type Users struct {
 	Sex    int    `json:"sex"`
 	Status int    `json:"status"`
 	Phone  string `json:"phone" form:"phone"`
+	Email string `json:"email" form:"email"`
 }
 
 type GetUserListReq struct {
@@ -182,6 +183,7 @@ func GetUserList(c *gin.Context) {
 			Sex:      v.Sex,
 			Status:   v.Status,
 			Phone:    v.Phone,
+			Email: 	  v.Email,
 		})
 	}
 
@@ -292,6 +294,7 @@ func GetUserByUserName(c *gin.Context) {
 	rsp.Data.User.Name = user.Name
 	rsp.Data.User.Sex = user.Sex
 	rsp.Data.User.Phone = user.Phone
+	rsp.Data.User.Email = user.Email
 	rsp.Status = "200"
 	c.JSON(200, rsp)
 	return
@@ -302,6 +305,7 @@ type EditUserByUserNameReq struct {
 	Name     string `json:"name" form:"name"`
 	Sex      string `json:"sex" form:"sex"`
 	Phone    string `json:"phone" form:"phone"`
+	Email 	 string `json:"email" form:"email"'`
 }
 
 type EditUserByUserNameRsp struct {
@@ -326,6 +330,7 @@ func EditUserByUserName(c *gin.Context) {
 	editUser := make(map[string]interface{}, 0)
 	editUser["Name"] = req.Name
 	editUser["phone"] = req.Phone
+	editUser["email"] = req.Email
 	if req.Sex == "男" {
 		editUser["sex"] = 0
 	} else {

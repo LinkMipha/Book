@@ -1,8 +1,11 @@
 package model
 
 import (
+	"Book/data"
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"math/rand"
 	"time"
 )
 
@@ -162,7 +165,8 @@ func (b*Borrow)GetBorrowByUserId(db*gorm.DB,userId string)([]Borrow,error){
 //根据user_id查询逾期的书籍
 func (b*Borrow)GetOverBorrowByUserId(db*gorm.DB,userId string)([]Borrow,error){
 	var borrows []Borrow
-	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("is_over = 1").Find(&borrows).Error
+	//借出且逾期
+	err:=db.Table(b.TableName()).Where("user_id = ?",userId).Where("is_over = 1").Where("status = ?",1).Find(&borrows).Error
 	return borrows,err
 }
 
@@ -235,7 +239,40 @@ func (b*Borrow)UpdateBorrow(db*gorm.DB, id int,ma map[string]interface{})error {
 	return  err
 }
 
-//获取借阅最多次数的四本图书
-//func (b*Borrow)GetTopBooks(db*gorm.DB) (error,Borrow) {
-//
-//}
+
+type FindBook struct {
+	BookId string `json:"book_id"`
+}
+
+//获取借阅最多次数的四本图书的url(可以扩展推荐多本书)
+func (b*Borrow)GetTopBooks(db*gorm.DB) ([]string,error) {
+	var urls []string
+	var bookId []FindBook
+	var sqlStr string
+	sqlStr = "select book_id from borrow where status!=0 group by book_id order by count(*) desc;"
+	err := db.Table(b.TableName()).Raw(sqlStr).Find(&bookId).Error
+
+	fmt.Println("*******************",bookId)
+
+	if len(bookId)<4{
+		//随机选取4本书
+		var book Book
+		_,total:=book.GetBookTotalNon(data.Db)
+		for i:=0;i<4;i++{
+			//时间做随机种子
+			rand.Seed(time.Now().UnixNano())
+			randIndex:=rand.Intn(total)
+			book,_ = book.GetBookById(data.Db,randIndex)
+			urls = append(urls,book.ImgUrl)
+		}
+		return urls,err
+	}else{
+		for i:=0;i<4;i++{
+			var qubook Book
+			book,_ := qubook.GetBookByIsbn(data.Db,bookId[i].BookId)
+			urls = append(urls,book.ImgUrl)
+		}
+		return urls,err
+	}
+
+}

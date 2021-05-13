@@ -119,6 +119,10 @@ func StartHttpServer(listen string) {
 
 	//手动调用判断是否逾期
 	router.POST("api/count_record_time", GinCountBookTime)
+
+	//推荐图书的链接 4本
+	router.GET("api/get_recommend_url",GetRecommendBooks)
+
 	//性能测试
 	go func() {
 		fmt.Println("pprof start")
